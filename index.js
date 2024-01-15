@@ -1,14 +1,25 @@
-import http from 'http'
+import express from 'express'
+import { userRouter } from './users/users.js'
 
-const host = '127.0.0.1';
 const port = 8000;
+const app = express();
 
-const server = http.createServer((req, res) => {
-	res.statusCode = 200;
-	res.setHeader('Content-Type', 'text/plain');
-	res.end('Привет!')
+app.use((req, res, next) => {
+	console.log('Время ', Date.now());
+	next();
 })
 
-server.listen(port, host, () => {
-	console.log(`Сервер запущен на ${host}:${port}`)
+app.get('/hello', (req, res) => {
+	throw new Error('Error!!!')
+})
+
+app.use('/users', userRouter)
+
+app.use((err, req, res, next) => {
+	console.log(err.message);
+	res.status(500).send(err.message);
+})
+
+app.listen(port, () => {
+	console.log(`Сервер запущен на http://localhost:${port}`)
 })

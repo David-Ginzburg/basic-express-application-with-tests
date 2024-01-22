@@ -1,4 +1,4 @@
-import { Logger } from 'tslog';
+import { Logger } from "tslog";
 
 export class LoggerService {
 	public logger: Logger;
@@ -7,9 +7,9 @@ export class LoggerService {
 		this.logger = new Logger({
 			displayInstanceName: false,
 			displayLoggerName: false,
-			displayFilePath: 'hidden',
+			displayFilePath: "hidden",
 			displayFunctionName: false
-		})
+		});
 	}
 
 	log(...args: unknown[]) {

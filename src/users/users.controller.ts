@@ -4,12 +4,11 @@ import { HTTPError } from "../errors/http-error.class";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../types";
 import { ILogger } from "../logger/logger.interface";
-import "reflect-metadata";
 import { IUserController } from "./users.controller.interface";
 import { UserLoginDto } from "./dto/user-login.dto";
 import { UserRegisterDto } from "./dto/user-register.dto";
-import { User } from "./user.entity";
 import { UserService } from "./users.service";
+import "reflect-metadata";
 
 @injectable()
 export class UserController extends BaseController implements IUserController {

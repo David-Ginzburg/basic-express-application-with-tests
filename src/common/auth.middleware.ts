@@ -1,4 +1,4 @@
-import { Response, Router, NextFunction, Request } from "express";
+import { Response, NextFunction, Request } from "express";
 import { IMiddleWare } from "./middleware.interface";
 import { verify } from "jsonwebtoken";
 
@@ -19,7 +19,8 @@ export class AuthMiddleware implements IMiddleWare {
 					}
 				}
 			});
+		} else {
+			next();
 		}
-		next();
 	}
 }

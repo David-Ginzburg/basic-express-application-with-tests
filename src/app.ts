@@ -1,3 +1,4 @@
+import { AuthMiddleware } from "./common/auth.middleware";
 import express, { Express } from "express";
 import { Server } from "http";
 import { IUserController } from "./users/users.controller.interface";
@@ -29,6 +30,8 @@ export class App {
 
 	useMiddleware(): void {
 		this.app.use(json());
+		const authMiddleware = new AuthMiddleware(this.configService.get("SECRET"));
+		this.app.use(authMiddleware.execute.bind(authMiddleware));
 	}
 
 	useRoutes(): void {

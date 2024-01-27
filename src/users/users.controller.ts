@@ -1,3 +1,4 @@
+import { ConfigService } from "./../config/config.service";
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "../common/base.controller";
 import { HTTPError } from "../errors/http-error.class";
@@ -10,12 +11,14 @@ import { UserRegisterDto } from "./dto/user-register.dto";
 import { UserService } from "./users.service";
 import "reflect-metadata";
 import { ValidateMiddleware } from "../common/validate.middleware";
+import { sign } from "jsonwebtoken";
 
 @injectable()
 export class UserController extends BaseController implements IUserController {
 	constructor(
 		@inject(TYPES.ILogger) private loggerService: ILogger,
-		@inject(TYPES.UserService) private UserService: UserService
+		@inject(TYPES.UserService) private userService: UserService,
+		@inject(TYPES.ConfigService) private configService: ConfigService
 	) {
 		super(loggerService);
 		this.bindRoutes([
@@ -39,7 +42,7 @@ export class UserController extends BaseController implements IUserController {
 		res: Response,
 		next: NextFunction
 	): Promise<void> {
-		const result = await this.UserService.createUser(body);
+		const result = await this.userService.createUser(body);
 
 		if (!result) {
 			return next(new HTTPError(422, "Такой пользователь уже существует", "register"));
@@ -53,12 +56,31 @@ export class UserController extends BaseController implements IUserController {
 		res: Response,
 		next: NextFunction
 	): Promise<void> {
-		const result = await this.UserService.validateUser(body);
+		const result = await this.userService.validateUser(body);
 
 		if (!result) {
 			return next(new HTTPError(401, "ошибка авторизации", "login"));
 		}
+		const jwt = await this.signJWT(body.email, this.configService.get("SECRET"));
+		this.ok(res, { jwt });
+	}
 
-		this.ok(res, body);
+	private signJWT(email: string, secret: string): Promise<string> {
+		return new Promise<string>((resolve, reject) => {
+			sign(
+				{
+					email,
+					iat: Math.floor(Date.now() / 1000)
+				},
+				secret,
+				{ algorithm: "HS256" },
+				(err, token) => {
+					if (err) {
+						reject(err);
+					}
+					resolve(token as string);
+				}
+			);
+		});
 	}
 }
